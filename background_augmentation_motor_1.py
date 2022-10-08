@@ -16,10 +16,10 @@ def creat_dir(out_dir):
 
 
 # 数据集路径
-dataset_image_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled\zhuohang3_8_green\image'
+dataset_image_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled\second_yolo_augementation\images'
 dataset_image_list=os.listdir(dataset_image_path)
 # 背景路径
-background_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled\background'
+background_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled\background1'
 background_path_list=os.listdir(background_path)
 #保存路径
 save_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled/test'
@@ -40,8 +40,11 @@ creat_dir(save_path)
 # lower_green=np.array([60,210,46])
 # upper_green=np.array([75,250,255])
 
+# lower_green=np.array([60,220,46])
+# upper_green=np.array([84,255,255])
+
 lower_green=np.array([60,190,46])
-upper_green=np.array([75,255,255])
+upper_green=np.array([80,255,255])
 
 # 黑白色翻转（我记得opencv是有现成函数来着）
 # def invert(src_img):
@@ -64,6 +67,7 @@ def get_resize_num(img1,img2):
 
 for i in range(len(dataset_image_list)):
     dataset_image = dataset_image_list[i]
+    # dataset_image = "310n_21.jpg"
     dataset_image_abs = dataset_image_path + '/' + dataset_image
     print('----process: {}-----'.format(dataset_image_abs))
     save_image= save_path +'/' + dataset_image
@@ -85,11 +89,34 @@ for i in range(len(dataset_image_list)):
 
     mask = cv2.inRange(dataset_image_cv_hsv, lower_green, upper_green)
 
-    #膨胀
-    mask = cv2.dilate(mask, (3, 3), iterations=7)
     # # cv2.imshow('dilate', mask)
     # #腐蚀
-    mask = cv2.erode(mask, (3,3), iterations=1)
+    mask = cv2.erode(mask, (5, 5), iterations=30)
+
+    # for i in range(10):
+    #     mask = cv2.erode(mask, (10,10), iterations=30)
+    #     height, width = mask.shape[:2]
+    #     size = (int(width * 0.5), int(height * 0.5))  # bgr
+    #     mask1 = cv2.resize(mask, size, interpolation=cv2.INTER_AREA)
+    #     cv2.imshow('mask', mask1)
+    #
+    #     cv2.waitKey(0)
+    #     cv2.destroyAllWindows()
+    #
+
+    #膨胀
+    mask = cv2.dilate(mask, (3, 3), iterations=10)
+
+
+    # for i in range(10):
+    #     mask = cv2.dilate(mask, (10,10), iterations=10)
+    #     height, width = mask.shape[:2]
+    #     size = (int(width * 0.5), int(height * 0.5))  # bgr
+    #     mask1 = cv2.resize(mask, size, interpolation=cv2.INTER_AREA)
+    #     cv2.imshow('mask', mask1)
+    #
+    #     cv2.waitKey(0)
+    #     cv2.destroyAllWindows()
     # # cv2.imshow('erode', mask)
 
 

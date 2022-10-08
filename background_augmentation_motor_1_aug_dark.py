@@ -16,10 +16,10 @@ def creat_dir(out_dir):
 
 
 # 数据集路径
-dataset_image_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled\zhuohang3_8_green\image'
+dataset_image_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled\second_yolo_augementation\images'
 dataset_image_list=os.listdir(dataset_image_path)
 # 背景路径
-background_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled\background'
+background_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled\background1'
 background_path_list=os.listdir(background_path)
 #保存路径
 save_path=r'G:\doing\Motor_detection_dataset\second_dataset\labeled/test'
@@ -40,8 +40,8 @@ creat_dir(save_path)
 # lower_green=np.array([60,210,46])
 # upper_green=np.array([75,250,255])
 
-lower_green=np.array([60,190,46])
-upper_green=np.array([75,255,255])
+lower_green=np.array([60,220,46])
+upper_green=np.array([84,255,255])
 
 # 黑白色翻转（我记得opencv是有现成函数来着）
 # def invert(src_img):
@@ -52,6 +52,63 @@ upper_green=np.array([75,255,255])
 #             grayPixel = src_img[i, j]
 #             dst_img[i, j] = 255 - grayPixel
 #     return dst_img
+
+
+# 椒盐噪声
+def SaltAndPepper(src, percetage):
+    SP_NoiseImg = src.copy()
+    SP_NoiseNum = int(percetage * src.shape[0] * src.shape[1])
+    for i in range(SP_NoiseNum):
+        randR = np.random.randint(0, src.shape[0] - 1)
+        randG = np.random.randint(0, src.shape[1] - 1)
+        randB = np.random.randint(0, 3)
+        if np.random.randint(0, 1) == 0:
+            SP_NoiseImg[randR, randG, randB] = 0
+        else:
+            SP_NoiseImg[randR, randG, randB] = 255
+    return SP_NoiseImg
+
+
+# 高斯噪声
+def addGaussianNoise(image, percetage):
+    G_Noiseimg = image.copy()
+    w = image.shape[1]
+    h = image.shape[0]
+    G_NoiseNum = int(percetage * image.shape[0] * image.shape[1])
+    for i in range(G_NoiseNum):
+        temp_x = np.random.randint(0, h)
+        temp_y = np.random.randint(0, w)
+        G_Noiseimg[temp_x][temp_y][np.random.randint(3)] = np.random.randn(1)[0]
+    return G_Noiseimg
+
+
+# 昏暗
+def darker(image, percetage=0.9):
+    image_copy = image.copy()
+    w = image.shape[1]
+    h = image.shape[0]
+    # get darker
+    for xi in range(0, w):
+        for xj in range(0, h):
+            image_copy[xj, xi, 0] = int(image[xj, xi, 0] * percetage)
+            image_copy[xj, xi, 1] = int(image[xj, xi, 1] * percetage)
+            image_copy[xj, xi, 2] = int(image[xj, xi, 2] * percetage)
+    return image_copy
+
+
+# 亮度
+def brighter(image, percetage=1.5):
+    image_copy = image.copy()
+    w = image.shape[1]
+    h = image.shape[0]
+    # get brighter
+    for xi in range(0, w):
+        for xj in range(0, h):
+            image_copy[xj, xi, 0] = np.clip(int(image[xj, xi, 0] * percetage), a_max=255, a_min=0)
+            image_copy[xj, xi, 1] = np.clip(int(image[xj, xi, 1] * percetage), a_max=255, a_min=0)
+            image_copy[xj, xi, 2] = np.clip(int(image[xj, xi, 2] * percetage), a_max=255, a_min=0)
+    return image_copy
+
 
 
 def get_resize_num(img1,img2):
@@ -86,10 +143,10 @@ for i in range(len(dataset_image_list)):
     mask = cv2.inRange(dataset_image_cv_hsv, lower_green, upper_green)
 
     #膨胀
-    mask = cv2.dilate(mask, (3, 3), iterations=7)
+    # mask = cv2.dilate(mask, (3, 3), iterations=10)
     # # cv2.imshow('dilate', mask)
     # #腐蚀
-    mask = cv2.erode(mask, (3,3), iterations=1)
+    # mask = cv2.erode(mask, (3,3), iterations=1)
     # # cv2.imshow('erode', mask)
 
 
@@ -102,14 +159,29 @@ for i in range(len(dataset_image_list)):
             if mask[i, j] == 255:
                 dataset_image_cv[i,j, 0:3] = background_image_resize[i, j, 0:3]
 
-    cv2.imwrite(save_image,dataset_image_cv)
-    # cv2.imshow('dataset',dataset_image_cv)
-print('Finish.')
+    # cv2.imshow('dataset', dataset_image_cv)
+    if random.randint(0,1):
+        dataset_image_cv=SaltAndPepper(dataset_image_cv,random.uniform(0.01,0.15))
+    else:
+        dataset_image_cv =  addGaussianNoise(dataset_image_cv,random.uniform(0.01,0.1))
+    if random.randint(0, 1):
+        dataset_image_cv = darker(dataset_image_cv,random.uniform(0.75,0.98))
+    else:
+        dataset_image_cv = brighter(dataset_image_cv, random.uniform(1.05,1.2))
+
+
+
+
+
+    # cv2.imwrite(save_image,dataset_image_cv)
+    # cv2.imshow('dataset_aug',dataset_image_cv)
+
 
     # cv2.imshow('mask', mask)
 
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+print('Finish.')
 
 
 
