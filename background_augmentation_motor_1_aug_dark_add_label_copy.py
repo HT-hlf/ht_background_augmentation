@@ -23,7 +23,7 @@ dataset_image_list=os.listdir(dataset_image_path)
 background_path=r'F:\doing\Motor_detection_dataset\second_dataset\labeled\background'
 background_path_list=os.listdir(background_path)
 #保存路径
-save_path=r'F:\doing\Motor_detection_dataset\third_dataset\labeled/dataset_aug_background_2_'
+save_path=r'F:\doing\Motor_detection_dataset\third_dataset\labeled/dataset_aug_background_1_'
 save_path_image=os.path.join(save_path,'image')
 save_path_label=os.path.join(save_path,'label')
 creat_dir(save_path_image)
@@ -126,8 +126,8 @@ def get_resize_num(img1,img2):
 for i in range(len(dataset_image_list)):
     dataset_image = dataset_image_list[i]
     dataset_label = dataset_image.rstrip('.jpg') + '.txt'
-    aug_dataset_image = 'aug_back_2_' + dataset_image
-    aug_dataset_label = 'aug_back_2_' + dataset_label
+    aug_dataset_image = 'aug_back_1_' + dataset_image
+    aug_dataset_label = 'aug_back_1_' + dataset_label
     dataset_image_abs = dataset_image_path + '/' + dataset_image
     dataset_label_abs = dataset_label_path + '/' + dataset_label
     print('----process: {}-----'.format(dataset_image_abs))
