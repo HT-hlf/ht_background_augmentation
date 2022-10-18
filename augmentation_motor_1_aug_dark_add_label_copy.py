@@ -21,7 +21,7 @@ dataset_label_path=r'F:\doing\Motor_detection\datasets_second_remove_noise_add_t
 dataset_image_list=os.listdir(dataset_image_path)
 
 #保存路径
-save_path=r'F:\doing\Motor_detection_dataset\third_dataset\labeled/dataset_dark_noise_1'
+save_path=r'F:\doing\Motor_detection_dataset\third_dataset\labeled/dataset_dark_noise_2'
 save_path_image=os.path.join(save_path,'image')
 save_path_label=os.path.join(save_path,'label')
 creat_dir(save_path_image)
@@ -184,7 +184,7 @@ def get_resize_num(img1,img2):
         return (img1_width,int(img2_height/img2_width*img1_width))
     else:
         return (int(img2_width/img2_height*img1_height),img1_height)
-
+dataset_image_list=dataset_image_list[::-1]
 for i in range(len(dataset_image_list)):
     dataset_image = dataset_image_list[i]
     dataset_label = dataset_image.rstrip('.jpg') + '.txt'
